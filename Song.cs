@@ -7,12 +7,12 @@ namespace mp3_lyrics_service
     [JsonPropertyName("name")]
     public string Name { get; set; }
     [JsonPropertyName("lyrics_custom")]
-    public string LyricsCustom { get; set; }
+    public string Lyrics { get; set; }
 
-    public Song(string name, string lyricsCustom)
+    public Song(string name, string lyrics)
     {
       Name = name;
-      LyricsCustom = lyricsCustom;
+      Lyrics = lyrics;
     }
   }
 }
