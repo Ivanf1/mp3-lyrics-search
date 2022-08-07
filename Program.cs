@@ -3,11 +3,11 @@ using mp3_lyrics_service;
 IHost host = Host.CreateDefaultBuilder(args)
     .UseWindowsService(options =>
     {
-      options.ServiceName = ".NET Joke Service";
+      options.ServiceName = ".NET lyrics service";
     })
     .ConfigureServices(services =>
     {
-      services.AddSingleton<JokeService>();
+      services.AddSingleton<FolderWatcher>();
       services.AddHostedService<Worker>();
     })
     .ConfigureLogging((context, logging) =>
