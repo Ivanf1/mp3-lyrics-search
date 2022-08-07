@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
 
 namespace mp3_lyrics_service
 {
@@ -10,17 +11,23 @@ namespace mp3_lyrics_service
       _logger = logger;
     }
 
-    public void ManageUpdate(string fileName)
+    public void ManageUpdate(string filePath)
     {
-      using (var tfile = GetFileHandle(fileName))
+      using (var tfile = GetFileHandle(filePath))
       {
         _logger.LogWarning(tfile.Tag.Lyrics);
+
+        string fileName = filePath.Split('\\').Last().Trim().Replace(".mp3", "");
+        Song song = new(fileName, tfile.Tag.Lyrics);
+        string jsonString = JsonSerializer.Serialize(song);
+        _logger.LogWarning(jsonString);
+
         tfile.Dispose();
       }
     }
 
     // https://stackoverflow.com/a/37154588/13363519
-    private TagLib.File GetFileHandle(string path, int timeoutMs = 2000)
+    private static TagLib.File GetFileHandle(string path, int timeoutMs = 2000)
     {
       var time = Stopwatch.StartNew();
       while (time.ElapsedMilliseconds < timeoutMs)
