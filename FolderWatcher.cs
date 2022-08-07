@@ -16,7 +16,7 @@ namespace mp3_lyrics_service
      */
     private readonly MemoryCache _memCache;
     private readonly CacheItemPolicy _cacheItemPolicy;
-    private const int CacheTimeMilliseconds = 1000;
+    private const int CacheTimeMilliseconds = 100;
 
     public FolderWatcher(ILogger<FolderWatcher> logger, TagManager tagManager)
     {
