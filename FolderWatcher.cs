@@ -1,34 +1,43 @@
-﻿namespace mp3_lyrics_service
+﻿using System.Runtime.Caching;
+
+namespace mp3_lyrics_service
 {
   public class FolderWatcher
   {
     private readonly ILogger<FolderWatcher> _logger;
-    private readonly FileSystemWatcher watcher;
+    private readonly TagManager _tagManager;
+    private readonly FileSystemWatcher _watcher;
 
-    public FolderWatcher(ILogger<FolderWatcher> logger)
+    /*
+     * OnChanged raises more than once per file change. We use a cache so 
+     * we can perform the desired operation only once even if the event gets
+     * raised more than once.
+     * https://failingfast.io/a-robust-solution-for-filesystemwatcher-firing-events-multiple-times/
+     */
+    private readonly MemoryCache _memCache;
+    private readonly CacheItemPolicy _cacheItemPolicy;
+    private const int CacheTimeMilliseconds = 1000;
+
+    public FolderWatcher(ILogger<FolderWatcher> logger, TagManager tagManager)
     {
       _logger = logger;
-      watcher = new FileSystemWatcher(@"D:\Musica\Mp3TagCsharp")
+      _memCache = MemoryCache.Default;
+      _cacheItemPolicy = new CacheItemPolicy()
       {
-        NotifyFilter = NotifyFilters.Attributes
-                          | NotifyFilters.CreationTime
-                          | NotifyFilters.DirectoryName
-                          | NotifyFilters.FileName
-                          | NotifyFilters.LastAccess
-                          | NotifyFilters.LastWrite
-                          | NotifyFilters.Security
-                          | NotifyFilters.Size
+        RemovedCallback = OnRemovedFromCache
       };
 
-      watcher.Changed += OnChanged;
-      watcher.Created += OnCreated;
-      watcher.Deleted += OnDeleted;
-      watcher.Renamed += OnRenamed;
-      watcher.Error += OnError;
+      _watcher = new FileSystemWatcher(@"D:\Musica\Mp3TagCsharp")
+      {
+        NotifyFilter = NotifyFilters.LastWrite
+      };
 
-      watcher.Filter = "*.txt";
-      watcher.IncludeSubdirectories = true;
-      watcher.EnableRaisingEvents = true;
+      _watcher.Changed += OnChanged;
+
+      _watcher.Filter = "*.mp3";
+      _watcher.IncludeSubdirectories = true;
+      _watcher.EnableRaisingEvents = true;
+      this._tagManager = tagManager;
     }
 
     private void OnChanged(object sender, FileSystemEventArgs e)
@@ -37,37 +46,21 @@
       {
         return;
       }
+      _cacheItemPolicy.AbsoluteExpiration = DateTimeOffset.Now.AddMilliseconds(CacheTimeMilliseconds);
+
+      // Only add if it is not there already (swallow others)
+      _memCache.AddOrGetExisting(e.Name, e, _cacheItemPolicy);
+    }
+
+    // Handle cache item expiring
+    private void OnRemovedFromCache(CacheEntryRemovedArguments args)
+    {
+      if (args.RemovedReason != CacheEntryRemovedReason.Expired) return;
+
+      // Now actually handle file event
+      var e = (FileSystemEventArgs)args.CacheItem.Value;
       _logger.LogWarning($"Changed: {e.FullPath}");
-    }
-
-    private void OnCreated(object sender, FileSystemEventArgs e)
-    {
-      string value = $"Created: {e.FullPath}";
-      _logger.LogWarning(value);
-    }
-
-    private void OnDeleted(object sender, FileSystemEventArgs e) =>
-        _logger.LogWarning($"Deleted: {e.FullPath}");
-
-    private void OnRenamed(object sender, RenamedEventArgs e)
-    {
-      _logger.LogWarning($"Renamed:");
-      _logger.LogWarning($"    Old: {e.OldFullPath}");
-      _logger.LogWarning($"    New: {e.FullPath}");
-    }
-
-    private void OnError(object sender, ErrorEventArgs e) =>
-        PrintException(e.GetException());
-
-    private void PrintException(Exception? ex)
-    {
-      if (ex != null)
-      {
-        _logger.LogWarning($"Message: {ex.Message}");
-        _logger.LogWarning("Stacktrace:");
-        _logger.LogWarning(ex.StackTrace);
-        PrintException(ex.InnerException);
-      }
+      _tagManager.ManageUpdate(e.FullPath);
     }
 
   }

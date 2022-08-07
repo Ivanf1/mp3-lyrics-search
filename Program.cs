@@ -7,6 +7,7 @@ IHost host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices(services =>
     {
+      services.AddSingleton<TagManager>();
       services.AddSingleton<FolderWatcher>();
       services.AddHostedService<Worker>();
     })
