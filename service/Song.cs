@@ -6,7 +6,7 @@ namespace mp3_lyrics_service
   {
     [JsonPropertyName("name")]
     public string Name { get; set; }
-    [JsonPropertyName("lyrics_custom")]
+    [JsonPropertyName("lyrics")]
     public string Lyrics { get; set; }
 
     public Song(string name, string lyrics)

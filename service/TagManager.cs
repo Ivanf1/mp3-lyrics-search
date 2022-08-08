@@ -1,26 +1,30 @@
 ﻿using System.Diagnostics;
-using System.Text.Json;
+using System.Net.Http.Json;
 
 namespace mp3_lyrics_service
 {
   public class TagManager
   {
+    static readonly HttpClient client = new()
+    {
+      BaseAddress = new Uri("http://localhost:8983/solr/mp3_lyrics/")
+    };
     private readonly ILogger<TagManager> _logger;
+
     public TagManager(ILogger<TagManager> logger)
     {
       _logger = logger;
     }
 
-    public void ManageUpdate(string filePath)
+    public async void ManageUpdate(string filePath)
     {
       using (var tfile = GetFileHandle(filePath))
       {
-        _logger.LogWarning(tfile.Tag.Lyrics);
-
         string fileName = filePath.Split('\\').Last().Trim().Replace(".mp3", "");
         Song song = new(fileName, tfile.Tag.Lyrics);
-        string jsonString = JsonSerializer.Serialize(song);
-        _logger.LogWarning(jsonString);
+
+        HttpResponseMessage response = await client.PostAsJsonAsync("update/json/docs", song);
+        _logger.LogWarning($"{(response.IsSuccessStatusCode ? "Success" : "Error")} - {response.StatusCode}");
 
         tfile.Dispose();
       }
