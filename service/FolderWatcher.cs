@@ -5,6 +5,7 @@ namespace mp3_lyrics_service
   public class FolderWatcher
   {
     private readonly ILogger<FolderWatcher> _logger;
+    private readonly FolderWatcherOptions _options;
     private readonly TagManager _tagManager;
     private readonly FileSystemWatcher _watcher;
 
@@ -18,16 +19,19 @@ namespace mp3_lyrics_service
     private readonly CacheItemPolicy _cacheItemPolicy;
     private const int CacheTimeMilliseconds = 100;
 
-    public FolderWatcher(ILogger<FolderWatcher> logger, TagManager tagManager)
+    public FolderWatcher(ILogger<FolderWatcher> logger, TagManager tagManager, FolderWatcherOptions options)
     {
       _logger = logger;
+      _tagManager = tagManager;
+      _options = options;
+
       _memCache = MemoryCache.Default;
       _cacheItemPolicy = new CacheItemPolicy()
       {
         RemovedCallback = OnRemovedFromCache
       };
 
-      _watcher = new FileSystemWatcher(@"D:\Musica\Mp3TagCsharp")
+      _watcher = new FileSystemWatcher(_options.FolderPath)
       {
         NotifyFilter = NotifyFilters.LastWrite
       };
@@ -37,7 +41,6 @@ namespace mp3_lyrics_service
       _watcher.Filter = "*.mp3";
       _watcher.IncludeSubdirectories = true;
       _watcher.EnableRaisingEvents = true;
-      this._tagManager = tagManager;
     }
 
     private void OnChanged(object sender, FileSystemEventArgs e)

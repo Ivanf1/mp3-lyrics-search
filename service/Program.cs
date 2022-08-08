@@ -5,8 +5,15 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
       options.ServiceName = ".NET lyrics service";
     })
-    .ConfigureServices(services =>
+    .ConfigureServices((context, services) =>
     {
+      IConfiguration configuration = context.Configuration;
+      TagManagerOptions tagManagerOptions = configuration.GetSection("SolrConfig").Get<TagManagerOptions>();
+      FolderWatcherOptions folderWatcherOptions = configuration.GetSection("WatchConfig").Get<FolderWatcherOptions>();
+
+      services.AddSingleton(tagManagerOptions);
+      services.AddSingleton(folderWatcherOptions);
+
       services.AddSingleton<TagManager>();
       services.AddSingleton<FolderWatcher>();
       services.AddHostedService<Worker>();

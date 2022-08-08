@@ -5,15 +5,15 @@ namespace mp3_lyrics_service
 {
   public class TagManager
   {
-    static readonly HttpClient client = new()
-    {
-      BaseAddress = new Uri("http://localhost:8983/solr/mp3_lyrics/")
-    };
+    private readonly TagManagerOptions _options;
     private readonly ILogger<TagManager> _logger;
+    static readonly HttpClient client = new();
 
-    public TagManager(ILogger<TagManager> logger)
+    public TagManager(ILogger<TagManager> logger, TagManagerOptions options)
     {
       _logger = logger;
+      _options = options;
+      client.BaseAddress = new Uri(_options.BaseUri);
     }
 
     public async void ManageUpdate(string filePath)
@@ -23,7 +23,7 @@ namespace mp3_lyrics_service
         string fileName = filePath.Split('\\').Last().Trim().Replace(".mp3", "");
         Song song = new(fileName, tfile.Tag.Lyrics);
 
-        HttpResponseMessage response = await client.PostAsJsonAsync("update/json/docs", song);
+        HttpResponseMessage response = await client.PostAsJsonAsync(_options.PostUri, song);
         _logger.LogWarning($"{(response.IsSuccessStatusCode ? "Success" : "Error")} - {response.StatusCode}");
 
         tfile.Dispose();
