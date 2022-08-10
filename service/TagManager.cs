@@ -18,16 +18,15 @@ namespace mp3_lyrics_service
 
     public async void ManageUpdate(string filePath)
     {
-      using (var tfile = GetFileHandle(filePath))
-      {
-        string fileName = filePath.Split('\\').Last().Trim().Replace(".mp3", "");
-        Song song = new(fileName, tfile.Tag.Lyrics);
+      using var tfile = GetFileHandle(filePath);
 
-        HttpResponseMessage response = await client.PostAsJsonAsync(_options.PostUri, song);
-        _logger.LogWarning($"{(response.IsSuccessStatusCode ? "Success" : "Error")} - {response.StatusCode}");
+      if (tfile.Tag.Lyrics == null) return;
 
-        tfile.Dispose();
-      }
+      string fileName = filePath.Split('\\').Last().Trim().Replace(".mp3", "");
+      Song song = new(fileName, tfile.Tag.Lyrics);
+
+      HttpResponseMessage response = await client.PostAsJsonAsync(_options.PostUri, song);
+      _logger.LogWarning($"{(response.IsSuccessStatusCode ? "Success" : "Error")} - {response.StatusCode}");
     }
 
     // https://stackoverflow.com/a/37154588/13363519
@@ -43,8 +42,7 @@ namespace mp3_lyrics_service
         catch (IOException e)
         {
           // access error
-          if (e.HResult != -2147024864)
-            throw;
+          if (e.HResult != -2147024864) throw;
         }
       }
 
