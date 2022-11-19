@@ -129,3 +129,20 @@ body {
   background-color: #944bbb;
   color: white;
 }
+
+.service-status-container {
+  min-height: 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: #000000 solid 0.1em;
+}
+
+.service-name {
+  align-self: center;
+  margin-left: 2em;
+}
+
+.service-status {
+  align-self: center;
+  justify-self: center;
+}
