@@ -1,6 +1,8 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
+import ServicesStatus from "./components/ServicesStatus";
+import Search from "./components/Search";
 
 function App() {
   // const [greetMsg, setGreetMsg] = useState("");
@@ -13,8 +15,12 @@ function App() {
 
   return (
     <div id="app-container">
-      <div id="left-container"></div>
-      <div id="right-container"></div>
+      <div id="left-container">
+        <ServicesStatus />
+      </div>
+      <div id="right-container">
+        <Search />
+      </div>
     </div>
   );
 }
