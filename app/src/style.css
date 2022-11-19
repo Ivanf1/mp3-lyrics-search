@@ -152,7 +152,8 @@ body {
 .service-status-container {
   min-height: 80px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 20px 1fr;
+  padding-left: 1em;
   background-color: #464646;
   border-radius: 0.5em;
   margin-bottom: 1em;
@@ -160,10 +161,34 @@ body {
 
 .service-name {
   align-self: center;
-  margin-left: 2em;
 }
 
 .service-status {
   align-self: center;
   justify-self: center;
+  width: 80%;
+}
+.service-status > button {
+  width: 100%;
+  padding: 0.4em 0.1em;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  align-self: center;
+  justify-self: center;
+}
+.status-dot-running {
+  box-shadow: 0px 0px 12px 2px #43f70c;
+  background: #43f70c;
+}
+.status-dot-not-running {
+  box-shadow: 0px 0px 12px 2px #e3170a;
+  background: #e3170a;
+}
+.status-dot-starting {
+  box-shadow: 0px 0px 12px 2px #fcba04;
+  background: #fcba04;
 }

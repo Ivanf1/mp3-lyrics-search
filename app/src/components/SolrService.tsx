@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
+import { Status } from "../common/ServiceStatus";
 import { SOLR_URL } from "../constants/constants";
-
-enum Status {
-  Loading = "loading",
-  Starting = "starting",
-  NotRunning = "not running",
-  Running = "running",
-}
+import StatusDot from "./StatusDot";
 
 const SolrService = () => {
   const [status, setStatus] = useState<Status>(Status.Loading);
@@ -34,7 +29,10 @@ const SolrService = () => {
   return (
     <div className="service-status-container">
       <div className="service-name">Solr</div>
-      <div className="service-status">{status}</div>
+      <StatusDot state={status} />
+      <div className="service-status">
+        <button>{status}</button>
+      </div>
     </div>
   );
 };
