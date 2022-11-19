@@ -3,15 +3,19 @@
     windows_subsystem = "windows"
 )]
 
+use sysinfo::{System, SystemExt};
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn check_service(service_name: &str) -> bool {
+    let mut sys = System::new_all();
+    sys.refresh_all();
+    sys.processes_by_exact_name(service_name).count() > 0
 }
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![check_service])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
