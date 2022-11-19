@@ -124,18 +124,8 @@ body {
   margin-bottom: 0.4em;
 }
 
-/* #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-  width: 100vw;
-  height: 100vh;
-} */
-
-/* @media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-} */
+.search-result-lyrics > em {
+  font-style: normal;
+  background-color: #944bbb;
+  color: white;
+}

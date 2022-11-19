@@ -3,19 +3,11 @@ interface Props {
   lyrics: string;
 }
 
-const SearchResult = () => {
+const SearchResult = ({ title, lyrics }: Props) => {
   return (
     <div className="search-result-container">
-      <span className="search-result-title">Tiffany feat. Skyler White - Say My Name</span>
-      <span className="search-result-lyrics">
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
-        laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
-        architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
-        aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione
-        voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet,
-        consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et
-        dolore magnam aliquam quaerat voluptatem
-      </span>
+      <span className="search-result-title">{title}</span>
+      <span className="search-result-lyrics" dangerouslySetInnerHTML={{ __html: lyrics }} />
     </div>
   );
 };
